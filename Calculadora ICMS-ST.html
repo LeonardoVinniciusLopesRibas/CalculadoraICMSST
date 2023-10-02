@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de ICMS-ST</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #calcForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.220);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de ICMS-ST</h1>
+    <form id="calcForm">
+        <label for="valorProduto">Valor do Produto (R$):</label>
+        <input type="number" id="valorProduto" step="0.01" required><br>
+        
+        <label for="valorIPI">Valor do IPI (R$):</label>
+        <input type="number" id="valorIPI" step="0.01"><br>
+        
+        <label for="frete">Valor do Frete (R$):</label>
+        <input type="number" id="frete" step="0.01"><br>
+        
+        <label for="seguro">Valor do Seguro (R$):</label>
+        <input type="number" id="seguro" step="0.01"><br>
+        
+        <label for="despesasAcessorias">Outras Despesas Acessórias (R$):</label>
+        <input type="number" id="despesasAcessorias" step="0.01"><br>
+        
+        <label for="descontos">Descontos (R$):</label>
+        <input type="number" id="descontos" step="0.01"><br>
+        
+        <label for="mva">% MVA:</label>
+        <input type="number" id="mva" step="0.01" required><br>
+        
+        <label for="aliquotaInter">Alíquota ICMS Interna (%):</label>
+        <input type="number" id="aliquotaInter" step="0.01" required><br>
+        
+        <label for="aliquotaIntra">Alíquota ICMS Intra (%):</label>
+        <input type="number" id="aliquotaIntra" step="0.01" required><br>
+        
+        <input type="submit" value="Calcular">
+    </form>
+    
+    <div id="resultado">
+        <!-- Resultado será exibido aqui -->
+    </div>
+
+    <script>
+        document.getElementById('calcForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Função para substituir vírgulas por pontos e tratar campos em branco como 0
+            function parseNumber(value) {
+                if (value.trim() === "") {
+                    return 0;
+                }
+                return parseFloat(value.replace(",", "."));
+            }
+
+            // Pegar os valores dos campos
+            const valorProduto = parseNumber(document.getElementById('valorProduto').value);
+            const valorIPI = parseNumber(document.getElementById('valorIPI').value);
+            const frete = parseNumber(document.getElementById('frete').value);
+            const seguro = parseNumber(document.getElementById('seguro').value);
+            const despesasAcessorias = parseNumber(document.getElementById('despesasAcessorias').value);
+            const descontos = parseNumber(document.getElementById('descontos').value);
+            const mva = parseNumber(document.getElementById('mva').value);
+            const aliquotaInter = parseNumber(document.getElementById('aliquotaInter').value);
+            const aliquotaIntra = parseNumber(document.getElementById('aliquotaIntra').value);
+            
+            // Calcular a base do ICMS Inter
+            const baseICMSInter = valorProduto + valorIPI + frete + seguro + despesasAcessorias - descontos;
+            
+            // Calcular o valor do ICMS Inter
+            const valorICMSInter = baseICMSInter * (aliquotaInter / 100);
+            
+            // Calcular a base do ICMS-ST
+            const baseICMSST = (baseICMSInter * (1 + (mva / 100)));
+            
+            // Calcular o valor do ICMS-ST
+            const valorICMSST = (baseICMSST * (aliquotaIntra / 100)) - valorICMSInter;
+            
+            // Exibir os resultados
+            document.getElementById('resultado').innerHTML = `
+                <p>Base de Cálculo ICMS Inter: R$ ${baseICMSInter.toFixed(2).replace(".", ",")}</p>
+                <p>Valor do ICMS Inter: R$ ${valorICMSInter.toFixed(2).replace(".", ",")}</p>
+                <p>Base de Cálculo ICMS-ST: R$ ${baseICMSST.toFixed(2).replace(".", ",")}</p>
+                <p>Valor do ICMS-ST: R$ ${valorICMSST.toFixed(2).replace(".", ",")}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
